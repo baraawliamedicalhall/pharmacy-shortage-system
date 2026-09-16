@@ -35,14 +35,18 @@ export function Navbar({ user }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
         {/* Brand & Logo */}
         <Link href={inAdminSection ? '/admin' : '/'} className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center text-white font-black shadow-md group-hover:bg-sky-500 transition-colors">
-            <Pill className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden bg-white p-0.5 flex items-center justify-center shadow-md group-hover:ring-2 group-hover:ring-sky-400 transition-all shrink-0">
+            <img
+              src="/logo.png"
+              alt="Bara-Awlia Medical Hall Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <div className="font-bold text-sm sm:text-base leading-tight tracking-tight flex items-center gap-1.5">
-              <span>Pharmacy Short</span>
-              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold bg-sky-950 text-sky-400 border border-sky-800">
-                Local LAN
+              <span>Bara-Awlia</span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] uppercase font-semibold bg-pink-950 text-pink-300 border border-pink-800">
+                Medical Hall
               </span>
             </div>
             <p className="text-[10px] text-slate-400 leading-none hidden sm:block">Shortage Collection System</p>

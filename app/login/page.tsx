@@ -79,10 +79,14 @@ function LoginForm() {
     <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
       {/* Header */}
       <div className="bg-slate-900 text-white p-6 text-center">
-        <div className="w-14 h-14 bg-sky-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg mb-3">
-          <Pill className="w-8 h-8 text-white" />
+        <div className="w-20 h-20 bg-white rounded-2xl mx-auto flex items-center justify-center p-1.5 shadow-xl mb-3 border border-slate-700">
+          <img
+            src="/logo.png"
+            alt="Bara-Awlia Medical Hall Logo"
+            className="w-full h-full object-contain"
+          />
         </div>
-        <h1 className="text-2xl font-black tracking-tight">Pharmacy Short</h1>
+        <h1 className="text-2xl font-black tracking-tight">Bara-Awlia Medical Hall</h1>
         <p className="text-xs text-slate-400 mt-1">Medicine Shortage Reporting System</p>
 
         <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-950/80 border border-emerald-800/80 rounded-full text-[11px] text-emerald-300 mt-3 font-medium">

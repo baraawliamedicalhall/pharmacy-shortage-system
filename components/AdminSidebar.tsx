@@ -39,13 +39,24 @@ export function AdminSidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800 shrink-0 no-print">
-        <div className="p-4 border-b border-slate-800">
-          <div className="text-[11px] uppercase font-bold tracking-wider text-slate-500 mb-1">
-            Admin Console
+        <div className="p-4 border-b border-slate-800 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-white p-1 overflow-hidden shrink-0 border border-slate-700 shadow-xs">
+            <img
+              src="/logo.png"
+              alt="Bara-Awlia Medical Hall Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div className="text-sm font-bold text-white flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Pharmacy System</span>
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 leading-tight">
+              Admin Console
+            </div>
+            <div className="text-sm font-black text-white leading-tight truncate">
+              Bara-Awlia
+            </div>
+            <div className="text-[11px] font-bold text-pink-400 leading-tight truncate">
+              Medical Hall
+            </div>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 {
-  "name": "Pharmacy Shortage Manager",
-  "short_name": "Pharmacy Short",
-  "description": "Fast local medicine shortage reporting for pharmacy staff",
+  "name": "Bara-Awlia Medical Hall",
+  "short_name": "BMH Order",
+  "description": "Medicine shortage reporting for Bara-Awlia Medical Hall",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

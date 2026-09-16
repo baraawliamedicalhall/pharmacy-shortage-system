@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pharmacy Short - Local Medicine Shortage Management",
-  description: "High-speed local pharmacy medicine shortage reporting and consolidation system",
+  title: "Bara-Awlia Medical Hall - Medicine Shortage Management",
+  description: "High-speed local medicine shortage reporting and consolidation system for Bara-Awlia Medical Hall",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Pharmacy Short",
+    title: "Bara-Awlia",
   },
   icons: {
     icon: "/icons/icon-192.png",

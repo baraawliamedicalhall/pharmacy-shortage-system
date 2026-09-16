@@ -483,7 +483,14 @@ function PrintShortageContent() {
       <div className="bg-white p-8 sm:p-12 max-w-4xl mx-auto border border-slate-300 shadow-md print:shadow-none print:border-none print:p-0 print:m-0 print:max-w-none text-slate-900">
         {/* Document Header */}
         <div className="text-center border-b-2 border-slate-900 pb-4 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wider">
+          <div className="flex justify-center mb-2">
+            <img
+              src="/logo.png"
+              alt="Bara-Awlia Medical Hall Logo"
+              className="h-16 w-auto object-contain"
+            />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wider text-slate-900">
             {pharmacyName}
           </h1>
           <h2 className="text-lg font-bold tracking-widest text-slate-800 uppercase mt-1">

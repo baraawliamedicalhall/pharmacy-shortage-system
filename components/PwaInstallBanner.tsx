@@ -41,7 +41,7 @@ export function PwaInstallBanner() {
     <div className="pwa-banner bg-sky-900 text-white px-4 py-3 border-b border-sky-800 flex items-center justify-between text-xs sm:text-sm">
       <div className="flex items-center gap-2">
         <Download className="w-4 h-4 text-sky-300 shrink-0" />
-        <span>Install <strong>Pharmacy Short</strong> app on home screen for 1-tap access!</span>
+        <span>Install <strong>Bara-Awlia Medical Hall</strong> app on home screen for 1-tap access!</span>
       </div>
       <div className="flex items-center gap-2">
         <button
