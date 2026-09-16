@@ -507,8 +507,8 @@ async function main() {
   // Initial System Settings
   await prisma.systemSetting.upsert({
     where: { key: 'pharmacy_name' },
-    update: { value: 'Central Community Pharmacy' },
-    create: { key: 'pharmacy_name', value: 'Central Community Pharmacy' },
+    update: { value: 'Bara-Awlia Medical Hall' },
+    create: { key: 'pharmacy_name', value: 'Bara-Awlia Medical Hall' },
   })
   await prisma.systemSetting.upsert({
     where: { key: 'require_quantity' },

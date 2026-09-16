@@ -234,7 +234,7 @@ export default function AdminShortagesPage() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/admin/print"
+            href={`/admin/print?date=${dateFilter}`}
             className="px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-xs shadow-xs flex items-center gap-1.5 transition-colors"
           >
             <Printer className="w-4 h-4" />
@@ -384,9 +384,16 @@ export default function AdminShortagesPage() {
                       </td>
 
                       <td className="p-3.5 text-right space-x-1">
+                        <Link
+                          href={`/admin/print?date=${item.reportedDate}&brand=${encodeURIComponent(item.medicine.brandName)}`}
+                          className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors inline-block align-middle"
+                          title={`Print shortages for ${item.medicine.brandName}`}
+                        >
+                          <Printer className="w-4 h-4" />
+                        </Link>
                         <button
                           onClick={() => openEditModal(item)}
-                          className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer inline-block align-middle"
                           title="Edit report"
                         >
                           <Edit2 className="w-4 h-4" />
@@ -398,7 +405,7 @@ export default function AdminShortagesPage() {
                               `${item.medicine.brandName} (${item.employee.name})`
                             )
                           }
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer inline-block align-middle"
                           title="Delete report"
                         >
                           <Trash2 className="w-4 h-4" />

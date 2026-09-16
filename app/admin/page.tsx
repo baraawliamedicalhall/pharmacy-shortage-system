@@ -414,6 +414,15 @@ export default function AdminDashboardPage() {
                             )}
                           </div>
 
+                          <Link
+                            href={`/admin/print?brand=${encodeURIComponent(item.medicine.brandName)}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors"
+                            title={`Print shortages for ${item.medicine.brandName}`}
+                          >
+                            <Printer className="w-4 h-4" />
+                          </Link>
+
                           <div className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
                             {isExpanded ? (
                               <ChevronUp className="w-5 h-5" />
