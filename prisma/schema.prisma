@@ -1,0 +1,122 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  EMPLOYEE
+}
+
+enum ShortageStatus {
+  REPORTED
+  REVIEWED
+  ORDERED
+  CANCELLED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  employeeId   String     @unique // Employee ID / login code (e.g. EMP001 or admin)
+  name         String
+  passwordHash String
+  role         Role       @default(EMPLOYEE)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  shortages    Shortage[] @relation("ReportedShortages")
+  auditLogs    AuditLog[]
+
+  @@index([employeeId])
+  @@index([role])
+}
+
+model Manufacturer {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  shortName String?
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  medicines Medicine[]
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model Medicine {
+  id              String        @id @default(cuid())
+  brandName       String
+  genericName     String
+  strength        String
+  dosageForm      String        // Tablet, Capsule, Syrup, Suspension, Injection, Ointment, Drop, Inhaler
+  manufacturerId  String
+  manufacturer    Manufacturer  @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  packDescription String?       // e.g., "10x10 blister pack"
+  purchaseUnit    String?       @default("Box") // Box, Strip, Bottle
+  retailUnit      String?       @default("Tablet") // Tablet, Capsule, Bottle
+  searchKeywords  String?       // Synonyms, common misspellings (e.g. "nappa paracitamol")
+  barcode         String?
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  shortages       Shortage[]
+
+  @@index([brandName])
+  @@index([genericName])
+  @@index([isActive])
+  @@index([manufacturerId])
+  @@index([barcode])
+}
+
+model Shortage {
+  id           String         @id @default(cuid())
+  medicineId   String
+  medicine     Medicine       @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  employeeId   String
+  employee     User           @relation("ReportedShortages", fields: [employeeId], references: [id], onDelete: Cascade)
+  quantity     Float?
+  unit         String?        @default("Box")
+  notes        String?
+  status       ShortageStatus @default(REPORTED)
+  reportedDate String         // Format: YYYY-MM-DD for fast date-based filtering and grouping
+  reportedAt   DateTime       @default(now())
+  reviewedAt   DateTime?
+  reviewedBy   String?        // Admin employee ID or name
+  orderedAt    DateTime?
+  orderedBy    String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([medicineId])
+  @@index([employeeId])
+  @@index([reportedDate])
+  @@index([reportedAt])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // e.g., "LOGIN", "BACKUP_CREATED", "MEDICINE_CREATED", "CSV_IMPORTED", "SHORTAGES_REVIEWED"
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
