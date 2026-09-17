@@ -105,7 +105,7 @@ export function AdminSidebar() {
             rel="noopener noreferrer"
             className="text-sky-400 font-semibold hover:underline block mt-0.5"
           >
-            3s-Soft (3s-soft.com)
+            3s-Soft
           </a>
         </div>
       </aside>

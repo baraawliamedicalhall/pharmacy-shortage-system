@@ -36,7 +36,7 @@ export default async function AdminLayout({
                 rel="noopener noreferrer"
                 className="text-sky-600 font-semibold hover:underline"
               >
-                3s-Soft (3s-soft.com)
+                3s-Soft
               </a>
             </p>
           </footer>

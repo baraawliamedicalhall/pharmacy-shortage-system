@@ -209,7 +209,7 @@ function LoginForm() {
               rel="noopener noreferrer"
               className="text-sky-600 hover:underline font-semibold"
             >
-              3s-Soft (3s-soft.com)
+              3s-Soft
             </a>
           </p>
         </div>

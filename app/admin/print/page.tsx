@@ -640,7 +640,15 @@ function PrintShortageContent() {
 
         {/* Footer Note */}
         <div className="mt-8 pt-3 border-t border-slate-200 text-center text-[10px] text-slate-500 print:text-black">
-          Bara-Awlia Medical Hall • Designed &amp; Developed by 3s-Soft (3s-soft.com)
+          Bara-Awlia Medical Hall • Designed &amp; Developed by{' '}
+          <a
+            href="https://3s-soft.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline font-semibold"
+          >
+            3s-Soft
+          </a>
         </div>
       </div>
     </div>
