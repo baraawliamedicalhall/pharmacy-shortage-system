@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { Pill, LogOut, Shield, Smartphone, Wifi } from 'lucide-react'
+import { Pill, LogOut, Shield, Smartphone, Wifi, CreditCard } from 'lucide-react'
 
 interface NavbarProps {
   user?: {
@@ -62,6 +62,16 @@ export function Navbar({ user }: NavbarProps) {
                 <Wifi className="w-3 h-3 animate-pulse" />
                 <span>Local Router</span>
               </div>
+
+              {/* POS Counter Link */}
+              <Link
+                href="/pos"
+                className="flex items-center gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-2.5 py-1.5 rounded-lg shadow-sm transition-colors cursor-pointer"
+                title="Open Retail POS Counter"
+              >
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>POS</span>
+              </Link>
 
               {/* Role Toggle for Admin */}
               {isAdmin && (

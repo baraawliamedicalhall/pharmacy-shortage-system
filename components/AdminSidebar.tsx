@@ -36,6 +36,12 @@ export function AdminSidebar() {
       ],
     },
     {
+      title: 'Counter & Retail Sales',
+      links: [
+        { href: '/pos', label: 'POS Terminal Counter', icon: CreditCard },
+      ],
+    },
+    {
       title: 'Wholesale & B2B (30+ Retailers)',
       links: [
         { href: '/admin/wholesale', label: 'Wholesale Hub', icon: Package, exact: true },
@@ -113,8 +119,15 @@ export function AdminSidebar() {
           ))}
         </nav>
 
-        {/* Quick link to employee view */}
-        <div className="p-3 border-t border-slate-800 shrink-0">
+        {/* Quick link to POS & employee view */}
+        <div className="p-3 border-t border-slate-800 shrink-0 space-y-2">
+          <Link
+            href="/pos"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition-colors"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span>Open POS Counter</span>
+          </Link>
           <Link
             href="/"
             className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-colors"
