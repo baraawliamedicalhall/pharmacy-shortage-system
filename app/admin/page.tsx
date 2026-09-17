@@ -16,6 +16,7 @@ import {
   ExternalLink,
   ShieldAlert,
   AlertCircle,
+  Trash2,
 } from 'lucide-react'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
 import { getLocalDateString } from '@/lib/date-utils'
@@ -141,6 +142,50 @@ export default function AdminDashboardPage() {
     } catch (err) {
       console.error('Review error:', err)
       addToast('error', 'Network error updating shortages')
+    }
+  }
+
+  // Delete single staff report from drilldown
+  const handleDeleteReport = async (reportId: string, brandName: string, employeeName: string) => {
+    if (!confirm(`Are you sure you want to delete ${employeeName}'s report for "${brandName}"?`)) return
+
+    try {
+      const res = await fetch(`/api/shortages/${reportId}`, { method: 'DELETE' })
+      if (res.ok) {
+        addToast('success', `Deleted ${employeeName}'s report for ${brandName}`)
+        loadDashboardData()
+      } else {
+        const data = await res.json()
+        addToast('error', data.error || 'Failed to delete report')
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
+      addToast('error', 'Network error deleting report')
+    }
+  }
+
+  // Delete all reports for a consolidated medicine
+  const handleDeleteAllForMedicine = async (medicineName: string, shortageIds: string[]) => {
+    if (shortageIds.length === 0) return
+    if (!confirm(`Are you sure you want to delete all ${shortageIds.length} report(s) for "${medicineName}"? This action cannot be undone.`)) return
+
+    try {
+      const res = await fetch('/api/shortages/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shortageIds }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        addToast('success', `Deleted all ${data.deletedCount} reports for ${medicineName}`)
+        loadDashboardData()
+      } else {
+        addToast('error', data.error || 'Failed to delete reports')
+      }
+    } catch (err) {
+      console.error('Bulk delete error:', err)
+      addToast('error', 'Network error deleting reports')
     }
   }
 
@@ -424,6 +469,20 @@ export default function AdminDashboardPage() {
                             <Printer className="w-4 h-4" />
                           </Link>
 
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteAllForMedicine(
+                                item.medicine.brandName,
+                                item.reports.map((r) => r.id)
+                              )
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            title={`Delete all ${item.reports.length} report(s) for ${item.medicine.brandName}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+
                           <div className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
                             {isExpanded ? (
                               <ChevronUp className="w-5 h-5" />
@@ -483,6 +542,21 @@ export default function AdminDashboardPage() {
                                 >
                                   {sub.status}
                                 </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDeleteReport(
+                                      sub.id,
+                                      item.medicine.brandName,
+                                      sub.employeeName
+                                    )
+                                  }}
+                                  className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                  title="Delete this submission"
+                                  aria-label="Delete submission"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             </div>
                           ))}

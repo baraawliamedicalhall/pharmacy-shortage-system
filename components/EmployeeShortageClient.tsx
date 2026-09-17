@@ -12,6 +12,7 @@ import {
   Zap,
   RefreshCw,
   Sparkles,
+  Pencil,
 } from 'lucide-react'
 import { Navbar } from '@/components/Navbar'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
@@ -79,6 +80,52 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
 
   const dismissToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id))
+  }
+
+  // Edit My Report state
+  const [editingReport, setEditingReport] = useState<ShortageReport | null>(null)
+  const [editQty, setEditQty] = useState<string>('')
+  const [editUnit, setEditUnit] = useState<string>('Box')
+  const [editNotes, setEditNotes] = useState<string>('')
+  const [savingEdit, setSavingEdit] = useState<boolean>(false)
+
+  const openEditModal = (report: ShortageReport) => {
+    setEditingReport(report)
+    setEditQty(report.quantity !== null && report.quantity !== undefined ? String(report.quantity) : '')
+    setEditUnit(report.unit || 'Box')
+    setEditNotes(report.notes || '')
+  }
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingReport) return
+
+    setSavingEdit(true)
+    try {
+      const res = await fetch(`/api/shortages/${editingReport.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quantity: editQty ? parseFloat(editQty) : null,
+          unit: editUnit,
+          notes: editNotes.trim() || null,
+        }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        addToast('success', `Updated ${editingReport.medicine.brandName}`)
+        setEditingReport(null)
+        loadMyReports()
+      } else {
+        addToast('error', data.error || 'Failed to update report')
+      }
+    } catch (err) {
+      console.error('Update error:', err)
+      addToast('error', 'Network error updating report')
+    } finally {
+      setSavingEdit(false)
+    }
   }
 
   // Load initial data on mount
@@ -503,20 +550,32 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
                         )}
                       </div>
 
-                      {/* Undo / Remove button for recent submission */}
-                      <button
-                        onClick={() =>
-                          handleRemoveReport(
-                            report.id,
-                            `${report.medicine.brandName} ${report.medicine.strength}`
-                          )
-                        }
-                        className="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
-                        title="Remove this report"
-                        aria-label="Remove report"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {/* Edit button */}
+                        <button
+                          onClick={() => openEditModal(report)}
+                          className="text-slate-400 hover:text-sky-600 p-2 rounded-lg hover:bg-sky-50 transition-colors cursor-pointer"
+                          title="Edit quantity or notes"
+                          aria-label="Edit report"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+
+                        {/* Undo / Remove button for recent submission */}
+                        <button
+                          onClick={() =>
+                            handleRemoveReport(
+                              report.id,
+                              `${report.medicine.brandName} ${report.medicine.strength}`
+                            )
+                          }
+                          className="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+                          title="Remove this report"
+                          aria-label="Remove report"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   )
                 })}
@@ -551,6 +610,93 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
         }}
         onSuccess={handleShortageSuccess}
       />
+
+      {/* Edit My Report Modal */}
+      {editingReport && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Edit Report
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {editingReport.medicine.brandName} {editingReport.medicine.strength} ({editingReport.medicine.dosageForm})
+                </p>
+              </div>
+              <button
+                onClick={() => setEditingReport(null)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Requested Quantity
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={editQty}
+                    onChange={(e) => setEditQty(e.target.value)}
+                    placeholder="Enter quantity (e.g. 5)"
+                    className="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-sky-500 focus:outline-hidden"
+                    autoFocus
+                  />
+                  <select
+                    value={editUnit}
+                    onChange={(e) => setEditUnit(e.target.value)}
+                    className="px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-sky-500 focus:outline-hidden"
+                  >
+                    <option value="Box">Box</option>
+                    <option value="Strip">Strip</option>
+                    <option value="Bottle">Bottle</option>
+                    <option value="Pcs">Pcs</option>
+                    <option value="Vial">Vial</option>
+                    <option value="Ampoule">Ampoule</option>
+                    <option value="Tube">Tube</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Notes (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="e.g., Customer waiting, urgent"
+                  className="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:border-sky-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingReport(null)}
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="px-4 py-2 text-xs font-bold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {savingEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -57,6 +57,8 @@ export default function AdminShortagesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [dateFilter, setDateFilter] = useState<string>(getLocalDateString())
   const [toasts, setToasts] = useState<ToastMessage[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [deletingBulk, setDeletingBulk] = useState(false)
 
   // Edit modal
   const [editingShortage, setEditingShortage] = useState<ShortageItem | null>(null)
@@ -91,6 +93,7 @@ export default function AdminShortagesPage() {
   }
 
   useEffect(() => {
+    setSelectedIds([])
     loadShortages()
   }, [dateFilter, statusFilter])
 
@@ -166,6 +169,60 @@ export default function AdminShortagesPage() {
       item.employee.employeeId.toLowerCase().includes(q)
     )
   })
+
+  // Bulk selection handlers
+  const handleToggleSelectAll = () => {
+    const selectableIds = filteredShortages.map((item) => item.id)
+    const allSelected =
+      selectableIds.length > 0 && selectableIds.every((id) => selectedIds.includes(id))
+
+    if (allSelected) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(selectableIds)
+    }
+  }
+
+  const handleToggleSelectOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return
+
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedIds.length} selected shortage report(s)? This action cannot be undone.`
+      )
+    ) {
+      return
+    }
+
+    setDeletingBulk(true)
+    try {
+      const res = await fetch('/api/shortages/bulk-delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shortageIds: selectedIds }),
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        addToast('success', `Successfully deleted ${data.deletedCount} shortage record(s)`)
+        setSelectedIds([])
+        loadShortages()
+      } else {
+        addToast('error', data.error || 'Failed to bulk delete shortages')
+      }
+    } catch (err) {
+      console.error('Bulk delete error:', err)
+      addToast('error', 'Network error during bulk delete')
+    } finally {
+      setDeletingBulk(false)
+    }
+  }
 
   // Export CSV
   const handleExportCSV = () => {
@@ -293,17 +350,47 @@ export default function AdminShortagesPage() {
 
       {/* Shortage Records Table */}
       <div className="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-            Shortage Submissions ({filteredShortages.length})
-          </span>
-          <button
-            onClick={loadShortages}
-            className="text-slate-400 hover:text-sky-600 p-1"
-            title="Reload records"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+        <div className="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+              Shortage Submissions ({filteredShortages.length})
+            </span>
+            {selectedIds.length > 0 && (
+              <span className="text-xs font-bold text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200">
+                {selectedIds.length} selected
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {selectedIds.length > 0 && (
+              <>
+                <button
+                  onClick={() => setSelectedIds([])}
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Deselect All
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  disabled={deletingBulk}
+                  className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Delete selected shortage reports"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{deletingBulk ? 'Deleting...' : `Bulk Delete (${selectedIds.length})`}</span>
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={loadShortages}
+              className="text-slate-400 hover:text-sky-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Reload records"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
 
         {loading ? (
@@ -319,6 +406,18 @@ export default function AdminShortagesPage() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="p-3.5 w-10 text-center">
+                    <input
+                      type="checkbox"
+                      checked={
+                        filteredShortages.length > 0 &&
+                        filteredShortages.every((item) => selectedIds.includes(item.id))
+                      }
+                      onChange={handleToggleSelectAll}
+                      className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer"
+                      title="Select all"
+                    />
+                  </th>
                   <th className="p-3.5">Medicine</th>
                   <th className="p-3.5">Manufacturer</th>
                   <th className="p-3.5">Quantity</th>
@@ -336,9 +435,23 @@ export default function AdminShortagesPage() {
                     ORDERED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
                     CANCELLED: 'bg-slate-100 text-slate-600 border-slate-200',
                   }
+                  const isSelected = selectedIds.includes(item.id)
 
                   return (
-                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr
+                      key={item.id}
+                      className={`transition-colors ${
+                        isSelected ? 'bg-sky-50/70 hover:bg-sky-100/60' : 'hover:bg-slate-50/80'
+                      }`}
+                    >
+                      <td className="p-3.5 text-center">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleSelectOne(item.id)}
+                          className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer"
+                        />
+                      </td>
                       <td className="p-3.5">
                         <div className="font-bold text-slate-900 text-sm">
                           {item.medicine.brandName} {item.medicine.strength}

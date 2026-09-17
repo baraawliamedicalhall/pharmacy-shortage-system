@@ -101,7 +101,17 @@ The database is seeded with demonstration data:
 
 ## 5. Local Windows Setup & Deployment Guide
 
-Follow these steps to run the application on the local pharmacy Windows PC:
+> 📖 **Full Client Guide Available:** See [CLIENT_SETUP_GUIDE.md](CLIENT_SETUP_GUIDE.md) for a complete, beginner-friendly setup manual designed for pharmacy client computers.
+
+### ⚡ 1-Click Setup (Fastest)
+After cloning or extracting the repository on the client PC:
+1. Ensure **Node.js LTS** (v20+) is installed.
+2. Double-click `start-server.bat` in the project root.
+3. The script automatically installs packages, initializes the SQLite database, compiles the production build, and launches the server at `http://localhost:3000`!
+
+---
+
+### 🛠️ Manual Step-by-Step Installation
 
 ### Step 1: Install Node.js
 1. Download **Node.js LTS (v20 or newer)** from [nodejs.org](https://nodejs.org).
@@ -111,7 +121,6 @@ Follow these steps to run the application on the local pharmacy Windows PC:
 Open PowerShell in the project directory:
 
 ```powershell
-cd "D:\SaaS Project\bmh_auto_order"
 npm install
 ```
 

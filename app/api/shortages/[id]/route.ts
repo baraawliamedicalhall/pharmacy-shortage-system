@@ -27,7 +27,10 @@ export async function DELETE(
     const todayStr = getLocalDateString()
     if (user.role === Role.EMPLOYEE) {
       if (shortage.employeeId !== user.userId) {
-        return NextResponse.json({ error: 'You can only delete your own reports' }, { status: 403 })
+        return NextResponse.json(
+          { error: 'Forbidden: You cannot delete another employee’s shortage report. Only Admins can delete reports submitted by other staff.' },
+          { status: 403 }
+        )
       }
       if (shortage.reportedDate !== todayStr) {
         return NextResponse.json({ error: 'Employees can only delete reports submitted today' }, { status: 403 })
@@ -66,7 +69,25 @@ export async function PATCH(
       return NextResponse.json({ error: 'Shortage record not found' }, { status: 404 })
     }
 
-    // Role restrictions: Only admin can change status; employee can only update their own notes/quantity
+    // Role check:
+    // Only Admin can edit other employees' shortage records or change status.
+    // An Employee can ONLY update their own report from today, and only quantity, unit, or notes.
+    const todayStr = getLocalDateString()
+    if (user.role === Role.EMPLOYEE) {
+      if (shortage.employeeId !== user.userId) {
+        return NextResponse.json(
+          { error: 'Forbidden: You cannot edit another employee’s shortage report. Only Admins can edit reports submitted by other staff.' },
+          { status: 403 }
+        )
+      }
+      if (shortage.reportedDate !== todayStr) {
+        return NextResponse.json(
+          { error: 'Employees can only edit reports submitted today' },
+          { status: 403 }
+        )
+      }
+    }
+
     const updateData: {
       quantity?: number | null
       unit?: string

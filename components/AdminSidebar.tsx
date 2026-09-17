@@ -14,6 +14,7 @@ import {
   Settings,
   Smartphone,
   ChevronRight,
+  Shield,
 } from 'lucide-react'
 
 export function AdminSidebar() {
@@ -39,23 +40,18 @@ export function AdminSidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800 shrink-0 no-print">
-        <div className="p-4 border-b border-slate-800 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1 overflow-hidden shrink-0 border border-slate-700 shadow-xs">
-            <img
-              src="/logo.png"
-              alt="Bara-Awlia Medical Hall Logo"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 leading-tight">
-              Admin Console
+        <div className="px-4 py-3.5 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
+              <Shield className="w-4 h-4" />
             </div>
-            <div className="text-sm font-black text-white leading-tight truncate">
-              Bara-Awlia
-            </div>
-            <div className="text-[11px] font-bold text-pink-400 leading-tight truncate">
-              Medical Hall
+            <div>
+              <div className="text-xs font-bold text-white tracking-wide uppercase">
+                Admin Console
+              </div>
+              <div className="text-[10px] text-slate-400 font-medium">
+                Management Portal
+              </div>
             </div>
           </div>
         </div>

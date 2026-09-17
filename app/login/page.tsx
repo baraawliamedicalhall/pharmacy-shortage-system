@@ -68,13 +68,6 @@ function LoginForm() {
     }
   }
 
-  // Quick fill helper for mobile testing
-  const handleQuickFill = (id: string, pass: string) => {
-    setEmployeeId(id)
-    setPassword(pass)
-    setError(null)
-  }
-
   return (
     <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
       {/* Header */}
@@ -127,7 +120,7 @@ function LoginForm() {
               autoCapitalize="characters"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="e.g. EMP001 or ADMIN"
+              placeholder="Enter Employee ID"
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value.toUpperCase())}
               required
@@ -150,7 +143,7 @@ function LoginForm() {
               name="password"
               type="password"
               autoComplete="current-password"
-              placeholder="Enter PIN (e.g. 1234)"
+              placeholder="Enter your PIN or password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -173,29 +166,6 @@ function LoginForm() {
             </>
           )}
         </button>
-
-        {/* Quick Credentials Buttons for Fast Staff Login */}
-        <div className="pt-3 border-t border-slate-100">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2">
-            Quick Auto-Fill
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickFill('EMP001', '1234')}
-              className="px-2.5 py-1.5 text-[11px] font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-center transition-colors cursor-pointer"
-            >
-              Staff: <strong>EMP001</strong> (1234)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickFill('ADMIN', 'admin123')}
-              className="px-2.5 py-1.5 text-[11px] font-semibold bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-center transition-colors cursor-pointer"
-            >
-              Admin: <strong>ADMIN</strong> (admin123)
-            </button>
-          </div>
-        </div>
 
         <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500 space-y-1">
           <p className="text-[11px] text-slate-400">
