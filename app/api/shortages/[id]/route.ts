@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { Role, ShortageStatus } from '@prisma/client'
+import { getLocalDateString } from '@/lib/date-utils'
 
 export async function DELETE(
   _req: NextRequest,
@@ -23,7 +24,7 @@ export async function DELETE(
     }
 
     // Role check: Employee can only delete their own record from today
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = getLocalDateString()
     if (user.role === Role.EMPLOYEE) {
       if (shortage.employeeId !== user.userId) {
         return NextResponse.json({ error: 'You can only delete your own reports' }, { status: 403 })

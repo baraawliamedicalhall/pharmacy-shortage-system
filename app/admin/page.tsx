@@ -18,6 +18,7 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
+import { getLocalDateString } from '@/lib/date-utils'
 
 interface ConsolidatedItem {
   medicineId: string
@@ -150,7 +151,7 @@ export default function AdminDashboardPage() {
       return
     }
 
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = getLocalDateString()
     const headers = ['No', 'Brand Name', 'Strength', 'Dosage Form', 'Generic Name', 'Manufacturer', 'Reports Count', 'Requested Quantity', 'Unit', 'Reported By Employees']
     
     const rows = consolidated.map((item, index) => [

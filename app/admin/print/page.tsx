@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { getLocalDateString } from '@/lib/date-utils'
 import {
   Printer,
   Download,
@@ -40,7 +41,7 @@ function PrintShortageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const dateFromQuery = searchParams.get('date') || new Date().toISOString().slice(0, 10)
+  const dateFromQuery = searchParams.get('date') || getLocalDateString()
   const brandFromQuery = searchParams.get('brand') || 'ALL'
   const mfgFromQuery = searchParams.get('manufacturer') || 'ALL'
 

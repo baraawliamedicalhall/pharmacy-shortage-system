@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
+import { getLocalDateString } from '@/lib/date-utils'
 
 interface ShortageItem {
   id: string
@@ -54,7 +55,7 @@ export default function AdminShortagesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
-  const [dateFilter, setDateFilter] = useState<string>(new Date().toISOString().slice(0, 10))
+  const [dateFilter, setDateFilter] = useState<string>(getLocalDateString())
   const [toasts, setToasts] = useState<ToastMessage[]>([])
 
   // Edit modal

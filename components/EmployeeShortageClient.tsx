@@ -107,10 +107,15 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
   const loadMyReports = async () => {
     try {
       setLoadingReports(true)
-      const res = await fetch('/api/shortages')
+      const res = await fetch('/api/shortages?mode=my')
       if (res.ok) {
         const data = await res.json()
-        setMyReports(data.reports || [])
+        const reportsList =
+          data.reports ||
+          (Array.isArray(data.rawReports)
+            ? data.rawReports.filter((r: any) => r.employeeId === user.id)
+            : [])
+        setMyReports(reportsList)
       }
     } catch (err) {
       console.error('Error loading my reports:', err)

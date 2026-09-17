@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { shortageCreateSchema } from '@/lib/validations'
 import { Role, ShortageStatus } from '@prisma/client'
+import { getLocalDateString } from '@/lib/date-utils'
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,14 +13,16 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url)
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = getLocalDateString()
+    const dateParam = searchParams.get('date') || todayStr
+    const modeParam = searchParams.get('mode')
 
-    // EMPLOYEE: Returns only their own submissions for today
-    if (user.role === Role.EMPLOYEE) {
+    // EMPLOYEE or mode=my: Returns submissions by current user for selected date
+    if (modeParam === 'my' || user.role === Role.EMPLOYEE) {
       const myReports = await prisma.shortage.findMany({
         where: {
           employeeId: user.userId,
-          reportedDate: todayStr,
+          reportedDate: dateParam,
         },
         include: {
           medicine: {
@@ -36,15 +39,15 @@ export async function GET(req: NextRequest) {
       })
 
       return NextResponse.json({
-        role: 'EMPLOYEE',
-        date: todayStr,
+        role: user.role,
+        date: dateParam,
         reports: myReports,
+        rawReports: myReports,
         count: myReports.length,
       })
     }
 
     // ADMIN: Consolidated view and filtering
-    const dateParam = searchParams.get('date') || todayStr
     const fromParam = searchParams.get('from')
     const toParam = searchParams.get('to')
     const statusParam = searchParams.get('status') as ShortageStatus | null
@@ -196,6 +199,7 @@ export async function GET(req: NextRequest) {
         pendingReview: pendingCount,
       },
       consolidated,
+      reports: allShortages,
       rawReports: allShortages,
     })
   } catch (error) {
@@ -234,7 +238,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Selected medicine was not found or is inactive' }, { status: 404 })
     }
 
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = (body.date as string) || getLocalDateString()
 
     const shortage = await prisma.shortage.create({
       data: {

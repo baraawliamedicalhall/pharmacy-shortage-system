@@ -14,9 +14,10 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
+import { getLocalDateString } from '@/lib/date-utils'
 
 export default function AdminReportsPage() {
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = getLocalDateString()
   const [mode, setMode] = useState<'single' | 'range'>('single')
   const [singleDate, setSingleDate] = useState(todayStr)
   const [fromDate, setFromDate] = useState(todayStr)

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { Role, ShortageStatus } from '@prisma/client'
 import { createAuditLog } from '@/lib/audit'
+import { getLocalDateString } from '@/lib/date-utils'
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json()
     const targetStatus = body.status as ShortageStatus
-    const date = body.date || new Date().toISOString().slice(0, 10)
+    const date = body.date || getLocalDateString()
     const shortageIds: string[] | undefined = body.shortageIds
 
     if (!([ShortageStatus.REVIEWED, ShortageStatus.ORDERED, ShortageStatus.CANCELLED] as ShortageStatus[]).includes(targetStatus)) {

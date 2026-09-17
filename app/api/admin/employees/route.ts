@@ -4,6 +4,7 @@ import { getCurrentUser, hashPassword } from '@/lib/auth'
 import { userCreateSchema } from '@/lib/validations'
 import { Role } from '@prisma/client'
 import { createAuditLog } from '@/lib/audit'
+import { getLocalDateString } from '@/lib/date-utils'
 
 export async function GET() {
   try {
@@ -12,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
     }
 
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = getLocalDateString()
 
     const employees = await prisma.user.findMany({
       select: {
