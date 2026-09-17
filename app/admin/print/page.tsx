@@ -51,6 +51,11 @@ function PrintShortageContent() {
   const [items, setItems] = useState<PrintShortageItem[]>([])
   const [loading, setLoading] = useState(true)
   const [pharmacyName, setPharmacyName] = useState('Bara-Awlia Medical Hall')
+  const [generatedTime, setGeneratedTime] = useState('')
+
+  useEffect(() => {
+    setGeneratedTime(new Date().toLocaleTimeString())
+  }, [])
 
   // Load shortage data for the selected date
   const loadData = async (date: string) => {
@@ -511,7 +516,7 @@ function PrintShortageContent() {
 
           <div className="flex items-center justify-between text-xs sm:text-sm font-semibold mt-3 text-slate-600 px-2">
             <div>
-              Date: <strong className="text-slate-900">{formattedDate}</strong>
+              Date: <strong className="text-slate-900" suppressHydrationWarning>{formattedDate}</strong>
             </div>
             {isFiltered && (
               <div className="text-slate-700 italic">
@@ -520,7 +525,9 @@ function PrintShortageContent() {
             )}
             <div>
               Generated:{' '}
-              <strong className="text-slate-900">{new Date().toLocaleTimeString()}</strong>
+              <strong className="text-slate-900" suppressHydrationWarning>
+                {generatedTime}
+              </strong>
             </div>
           </div>
         </div>

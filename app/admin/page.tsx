@@ -204,7 +204,7 @@ export default function AdminDashboardPage() {
               Live LAN
             </span>
           </div>
-          <p className="text-sm text-slate-500 font-medium mt-0.5">{todayFormatted}</p>
+          <p className="text-sm text-slate-500 font-medium mt-0.5" suppressHydrationWarning>{todayFormatted}</p>
         </div>
 
         {/* Global Dashboard Actions */}

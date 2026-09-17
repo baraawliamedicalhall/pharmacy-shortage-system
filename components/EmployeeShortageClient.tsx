@@ -273,7 +273,7 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <h1 className="text-lg font-bold text-slate-900">Medicine Short</h1>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200" suppressHydrationWarning>
               Today: {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
             </span>
           </div>
