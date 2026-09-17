@@ -15,20 +15,45 @@ import {
   Smartphone,
   ChevronRight,
   Shield,
+  Store,
+  ShoppingCart,
+  PlusCircle,
+  CreditCard,
+  Package,
 } from 'lucide-react'
 
 export function AdminSidebar() {
   const pathname = usePathname()
 
-  const links = [
-    { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    { href: '/admin/shortages', label: "Today's Shortages", icon: ClipboardList },
-    { href: '/admin/medicines', label: 'Medicine Master', icon: Pill },
-    { href: '/admin/manufacturers', label: 'Manufacturers', icon: Building2 },
-    { href: '/admin/employees', label: 'Employees', icon: Users },
-    { href: '/admin/reports', label: 'History & Reports', icon: FileText },
-    { href: '/admin/print', label: 'Print List (A4)', icon: Printer },
-    { href: '/admin/settings', label: 'Backup & Network', icon: Settings },
+  const sections = [
+    {
+      title: 'Shortage System',
+      links: [
+        { href: '/admin', label: 'Overview', icon: LayoutDashboard, exact: true },
+        { href: '/admin/shortages', label: "Today's Shortages", icon: ClipboardList },
+        { href: '/admin/print', label: 'Print Shortages (A4)', icon: Printer },
+        { href: '/admin/reports', label: 'History & Reports', icon: FileText },
+      ],
+    },
+    {
+      title: 'Wholesale & B2B (30+ Retailers)',
+      links: [
+        { href: '/admin/wholesale', label: 'Wholesale Hub', icon: Package, exact: true },
+        { href: '/admin/wholesale/orders/new', label: 'New Wholesale Order', icon: PlusCircle },
+        { href: '/admin/wholesale/orders', label: 'Wholesale Orders', icon: ShoppingCart },
+        { href: '/admin/wholesale/retailers', label: 'Retailer Directory (30+)', icon: Store },
+        { href: '/admin/wholesale/payments', label: 'Dues & Payments', icon: CreditCard },
+      ],
+    },
+    {
+      title: 'Catalog & System',
+      links: [
+        { href: '/admin/medicines', label: 'Medicine & Price Master', icon: Pill },
+        { href: '/admin/manufacturers', label: 'Manufacturers', icon: Building2 },
+        { href: '/admin/employees', label: 'Employees', icon: Users },
+        { href: '/admin/settings', label: 'Backup & Network', icon: Settings },
+      ],
+    },
   ]
 
   const isActive = (href: string, exact = false) => {
@@ -39,8 +64,8 @@ export function AdminSidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800 shrink-0 no-print">
-        <div className="px-4 py-3.5 border-b border-slate-800 flex items-center justify-between">
+      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800 shrink-0 no-print h-screen sticky top-0">
+        <div className="px-4 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400">
               <Shield className="w-4 h-4" />
@@ -50,39 +75,46 @@ export function AdminSidebar() {
                 Admin Console
               </div>
               <div className="text-[10px] text-slate-400 font-medium">
-                Management Portal
+                Shortage &amp; Wholesale
               </div>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {links.map((link) => {
-            const Icon = link.icon
-            const active = isActive(link.href, link.exact)
+        <nav className="flex-1 p-3 space-y-4 overflow-y-auto custom-scrollbar">
+          {sections.map((section, idx) => (
+            <div key={idx} className="space-y-1">
+              <div className="px-3 py-1 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
+                {section.title}
+              </div>
+              {section.links.map((link) => {
+                const Icon = link.icon
+                const active = isActive(link.href, link.exact)
 
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  active
-                    ? 'bg-sky-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-400'}`} />
-                  <span>{link.label}</span>
-                </div>
-                {active && <ChevronRight className="w-4 h-4 text-white/80" />}
-              </Link>
-            )
-          })}
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
+                      active
+                        ? 'bg-sky-600 text-white shadow-md'
+                        : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                      <span className="truncate">{link.label}</span>
+                    </div>
+                    {active && <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />}
+                  </Link>
+                )
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Quick link to employee view */}
-        <div className="p-3 border-t border-slate-800">
+        <div className="p-3 border-t border-slate-800 shrink-0">
           <Link
             href="/"
             className="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-colors"
@@ -93,7 +125,7 @@ export function AdminSidebar() {
         </div>
 
         {/* Developer Credit */}
-        <div className="p-3 border-t border-slate-800/80 text-[10px] text-slate-500 text-center leading-tight">
+        <div className="p-2.5 border-t border-slate-800/80 text-[10px] text-slate-500 text-center leading-tight shrink-0">
           <span>Designed &amp; Developed by</span>
           <a
             href="https://3s-soft.com"
@@ -107,9 +139,9 @@ export function AdminSidebar() {
       </aside>
 
       {/* Mobile Horizontal Sub-Navigation */}
-      <div className="lg:hidden bg-slate-900 border-b border-slate-800 text-white overflow-x-auto no-print">
-        <div className="flex items-center gap-1 p-2 min-w-max">
-          {links.map((link) => {
+      <div className="lg:hidden bg-slate-900 border-b border-slate-800 text-white overflow-x-auto no-print sticky top-14 z-20">
+        <div className="flex items-center gap-1.5 p-2 min-w-max">
+          {sections.flatMap((s) => s.links).map((link) => {
             const Icon = link.icon
             const active = isActive(link.href, link.exact)
 
@@ -118,10 +150,10 @@ export function AdminSidebar() {
                 key={link.href}
                 href={link.href}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  active ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white bg-slate-800/40'
+                  active ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white bg-slate-800/40'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-3.5 h-3.5 shrink-0" />
                 <span>{link.label}</span>
               </Link>
             )

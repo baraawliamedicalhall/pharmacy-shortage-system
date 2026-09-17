@@ -27,6 +27,13 @@ export const medicineSchema = z.object({
   searchKeywords: z.string().trim().nullable().optional(),
   barcode: z.string().trim().nullable().optional(),
   isActive: z.boolean().default(true),
+  mrp: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().nullable().optional()),
+  stripPrice: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().nullable().optional()),
+  boxPrice: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().nullable().optional()),
+  tradePrice: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().nullable().optional()),
+  tradeBoxPrice: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().nullable().optional()),
+  unitsPerStrip: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().int().nullable().optional()),
+  stripsPerBox: z.preprocess((v) => (v === '' || v === null || v === undefined ? null : Number(v)), z.number().int().nullable().optional()),
 })
 
 export const manufacturerSchema = z.object({

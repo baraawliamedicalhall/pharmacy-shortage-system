@@ -10,6 +10,7 @@ generator client {
 enum Role {
   ADMIN
   EMPLOYEE
+  RETAILER
 }
 
 enum ShortageStatus {
@@ -17,6 +18,27 @@ enum ShortageStatus {
   REVIEWED
   ORDERED
   CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PACKED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  DUE
+  PARTIAL
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  BKASH
+  BANK
+  CREDIT
 }
 
 model User {
@@ -67,7 +89,19 @@ model Medicine {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
+  // Pricing & Pack configuration
+  mrp             Float?        // Maximum Retail Price per unit (Tablet/Capsule/Bottle)
+  stripPrice      Float?        // Retail Price per Strip
+  boxPrice        Float?        // Retail Price per Box
+  tradePrice      Float?        // Wholesale / Trade Price (TP) per unit
+  tradeBoxPrice   Float?        // Wholesale / Trade Price (TP) per box
+  unitsPerStrip   Int?          @default(10)
+  stripsPerBox    Int?          @default(10)
+  unitsPerBox     Int?          @default(100)
+  vatPercentage   Float?        @default(0)
+
   shortages       Shortage[]
+  wholesaleItems  WholesaleOrderItem[]
 
   @@index([brandName])
   @@index([genericName])
@@ -102,11 +136,107 @@ model Shortage {
   @@index([status])
 }
 
+// B2B Retailer Profile (for 30+ Retailers)
+model Retailer {
+  id                    String            @id @default(cuid())
+  retailerCode          String            @unique // e.g. RET-001, RET-002
+  storeName             String            // Pharmacy / Store Name
+  ownerName             String            // Proprietor / Contact Person
+  phone                 String            // Contact Number
+  email                 String?
+  address               String            // Physical Address
+  marketRoute           String?           // Market route or area (e.g. "Hospital Gate", "Bazaar Road")
+  defaultDiscountPercent Float            @default(12.0) // Default trade discount % off MRP
+  creditLimit           Float             @default(50000.0) // Credit limit in BDT
+  currentDue            Float             @default(0.0) // Current outstanding due balance
+  pinCode               String?           // Optional 4-digit PIN for quick mobile login
+  isActive              Boolean           @default(true)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  orders                WholesaleOrder[]
+  payments              RetailerPayment[]
+
+  @@index([storeName])
+  @@index([retailerCode])
+  @@index([phone])
+  @@index([marketRoute])
+  @@index([isActive])
+}
+
+// Wholesale Order
+model WholesaleOrder {
+  id             String               @id @default(cuid())
+  orderNumber    String               @unique // e.g. WHO-20260918-001
+  retailerId     String
+  retailer       Retailer             @relation(fields: [retailerId], references: [id], onDelete: Restrict)
+  orderDate      String               // YYYY-MM-DD
+  deliveryDate   String?              // YYYY-MM-DD
+  status         OrderStatus          @default(PENDING)
+  paymentStatus  PaymentStatus        @default(DUE)
+  paymentMethod  PaymentMethod        @default(CASH)
+  subtotal       Float                @default(0) // Sum of MRP total
+  discountAmount Float                @default(0) // Trade discount deducted
+  taxAmount      Float                @default(0) // VAT if applicable
+  totalAmount    Float                @default(0) // Final payable after discount
+  paidAmount     Float                @default(0) // Amount paid
+  dueAmount      Float                @default(0) // Remaining due
+  notes          String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  items          WholesaleOrderItem[]
+  payments       RetailerPayment[]
+
+  @@index([retailerId])
+  @@index([orderDate])
+  @@index([status])
+  @@index([paymentStatus])
+}
+
+// Line item in Wholesale Order
+model WholesaleOrderItem {
+  id              String         @id @default(cuid())
+  orderId         String
+  order           WholesaleOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  medicineId      String
+  medicine        Medicine       @relation(fields: [medicineId], references: [id], onDelete: Restrict)
+  quantity        Float          // Quantity ordered in specified unit
+  unit            String         @default("Box") // Box, Strip, Tablet, Bottle
+  unitPrice       Float          // MRP unit rate
+  tradePrice      Float          // Wholesale rate applied
+  discountPercent Float          @default(12.0)
+  total           Float          // Final line total after discount
+  createdAt       DateTime       @default(now())
+
+  @@index([orderId])
+  @@index([medicineId])
+}
+
+// Retailer Payment / Due Collection Ledger
+model RetailerPayment {
+  id            String          @id @default(cuid())
+  retailerId    String
+  retailer      Retailer        @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  orderId       String?
+  order         WholesaleOrder? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  amount        Float
+  paymentMethod PaymentMethod   @default(CASH)
+  referenceNo   String?         // e.g. bKash TrxID or Cheque No
+  notes         String?
+  paymentDate   String          // YYYY-MM-DD
+  createdAt     DateTime        @default(now())
+
+  @@index([retailerId])
+  @@index([orderId])
+  @@index([paymentDate])
+}
+
 model AuditLog {
   id        String   @id @default(cuid())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  action    String   // e.g., "LOGIN", "BACKUP_CREATED", "MEDICINE_CREATED", "CSV_IMPORTED", "SHORTAGES_REVIEWED"
+  action    String   // e.g., "LOGIN", "BACKUP_CREATED", "MEDICINE_CREATED", "CSV_IMPORTED", "WHOLESALE_ORDER_CREATED"
   details   String?
   ipAddress String?
   createdAt DateTime @default(now())

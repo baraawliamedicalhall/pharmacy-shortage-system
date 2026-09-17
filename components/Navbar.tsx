@@ -9,7 +9,7 @@ interface NavbarProps {
   user?: {
     employeeId: string
     name: string
-    role: 'ADMIN' | 'EMPLOYEE'
+    role: 'ADMIN' | 'EMPLOYEE' | 'RETAILER'
   } | null
 }
 

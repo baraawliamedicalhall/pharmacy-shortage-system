@@ -34,6 +34,11 @@ interface MedicineItem {
   searchKeywords: string | null
   barcode: string | null
   isActive: boolean
+  mrp?: number | null
+  stripPrice?: number | null
+  boxPrice?: number | null
+  tradePrice?: number | null
+  tradeBoxPrice?: number | null
   manufacturer?: {
     id: string
     name: string
@@ -75,6 +80,9 @@ export default function AdminMedicinesPage() {
   const [formKeywords, setFormKeywords] = useState('')
   const [formBarcode, setFormBarcode] = useState('')
   const [formActive, setFormActive] = useState(true)
+  const [formMrp, setFormMrp] = useState('')
+  const [formBoxPrice, setFormBoxPrice] = useState('')
+  const [formTradePrice, setFormTradePrice] = useState('')
   const [savingMed, setSavingMed] = useState(false)
 
   // Modal: CSV Import
@@ -156,6 +164,9 @@ export default function AdminMedicinesPage() {
     setFormKeywords('')
     setFormBarcode('')
     setFormActive(true)
+    setFormMrp('')
+    setFormBoxPrice('')
+    setFormTradePrice('')
     setIsModalOpen(true)
   }
 
@@ -173,6 +184,9 @@ export default function AdminMedicinesPage() {
     setFormKeywords(item.searchKeywords || '')
     setFormBarcode(item.barcode || '')
     setFormActive(item.isActive)
+    setFormMrp(item.mrp !== null && item.mrp !== undefined ? String(item.mrp) : '')
+    setFormBoxPrice(item.boxPrice !== null && item.boxPrice !== undefined ? String(item.boxPrice) : '')
+    setFormTradePrice(item.tradePrice !== null && item.tradePrice !== undefined ? String(item.tradePrice) : '')
     setIsModalOpen(true)
   }
 
@@ -198,6 +212,10 @@ export default function AdminMedicinesPage() {
         searchKeywords: formKeywords.trim() || null,
         barcode: formBarcode.trim() || null,
         isActive: formActive,
+        mrp: formMrp ? parseFloat(formMrp) : null,
+        boxPrice: formBoxPrice ? parseFloat(formBoxPrice) : null,
+        tradePrice: formTradePrice ? parseFloat(formTradePrice) : null,
+        tradeBoxPrice: formBoxPrice ? Math.round(parseFloat(formBoxPrice) * 0.88 * 100) / 100 : null,
       }
 
       const url = editingId ? `/api/admin/medicines/${editingId}` : '/api/admin/medicines'
@@ -445,6 +463,8 @@ export default function AdminMedicinesPage() {
                   <th className="p-3.5">Generic Name</th>
                   <th className="p-3.5">Dosage Form</th>
                   <th className="p-3.5">Manufacturer</th>
+                  <th className="p-3.5 text-right">MRP (Retail)</th>
+                  <th className="p-3.5 text-right">Trade Price (Wholesale)</th>
                   <th className="p-3.5">Units</th>
                   <th className="p-3.5">Status</th>
                   <th className="p-3.5 text-right">Actions</th>
@@ -472,6 +492,14 @@ export default function AdminMedicinesPage() {
 
                     <td className="p-3.5 font-medium text-slate-700">
                       {item.manufacturer?.shortName || item.manufacturer?.name}
+                    </td>
+
+                    <td className="p-3.5 text-right font-mono font-bold text-slate-800">
+                      {item.boxPrice ? `৳${item.boxPrice}/box` : item.mrp ? `৳${item.mrp}/unit` : '—'}
+                    </td>
+
+                    <td className="p-3.5 text-right font-mono font-bold text-emerald-700">
+                      {item.tradeBoxPrice ? `৳${item.tradeBoxPrice}/box` : item.tradePrice ? `৳${item.tradePrice}/unit` : '—'}
                     </td>
 
                     <td className="p-3.5 text-slate-500 text-[11px]">
@@ -677,6 +705,47 @@ export default function AdminMedicinesPage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Unit MRP (BDT)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="e.g. 5.00"
+                    value={formMrp}
+                    onChange={(e) => {
+                      setFormMrp(e.target.value)
+                      if (!formTradePrice && e.target.value) {
+                        setFormTradePrice(String(Math.round(parseFloat(e.target.value) * 0.88 * 100) / 100))
+                      }
+                    }}
+                    className="w-full h-10 px-3 bg-slate-50 border border-slate-300 rounded-xl font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Box Price (BDT)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="e.g. 500.00"
+                    value={formBoxPrice}
+                    onChange={(e) => setFormBoxPrice(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-50 border border-slate-300 rounded-xl font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Trade Price (Wholesale)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="e.g. 4.40"
+                    value={formTradePrice}
+                    onChange={(e) => setFormTradePrice(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-50 border border-slate-300 rounded-xl font-mono text-emerald-700 font-bold"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

@@ -23,7 +23,7 @@ export interface UserProfile {
   id: string
   employeeId: string
   name: string
-  role: 'ADMIN' | 'EMPLOYEE'
+  role: 'ADMIN' | 'EMPLOYEE' | 'RETAILER'
 }
 
 interface ShortageReport {
