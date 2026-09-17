@@ -95,6 +95,19 @@ export function AdminSidebar() {
             <span>Mobile Staff Entry</span>
           </Link>
         </div>
+
+        {/* Developer Credit */}
+        <div className="p-3 border-t border-slate-800/80 text-[10px] text-slate-500 text-center leading-tight">
+          <span>Designed &amp; Developed by</span>
+          <a
+            href="https://3s-soft.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sky-400 font-semibold hover:underline block mt-0.5"
+          >
+            3s-Soft (3s-soft.com)
+          </a>
+        </div>
       </aside>
 
       {/* Mobile Horizontal Sub-Navigation */}

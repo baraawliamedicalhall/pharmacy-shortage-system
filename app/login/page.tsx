@@ -197,12 +197,20 @@ function LoginForm() {
           </div>
         </div>
 
-        <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500">
+        <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500 space-y-1">
           <p className="text-[11px] text-slate-400">
-            Pharmacy Shortage System • Local Wi-Fi Network
+            Bara-Awlia Medical Hall • Local Wi-Fi Network
           </p>
-          <p className="text-[10px] text-slate-400 mt-0.5">
-            Employees log in with assigned ID & PIN • Admin logs in with Administrator credentials
+          <p className="text-[10px] text-slate-400">
+            Designed &amp; Developed by{' '}
+            <a
+              href="https://3s-soft.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-600 hover:underline font-semibold"
+            >
+              3s-Soft (3s-soft.com)
+            </a>
           </p>
         </div>
       </form>

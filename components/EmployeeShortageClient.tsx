@@ -519,6 +519,21 @@ export function EmployeeShortageClient({ user }: EmployeeShortageClientProps) {
             )}
           </div>
         </div>
+
+        {/* Footer Credit */}
+        <footer className="mt-8 py-4 text-center text-xs text-slate-400 border-t border-slate-200">
+          <p>
+            Designed &amp; Developed by{' '}
+            <a
+              href="https://3s-soft.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-600 font-semibold hover:underline"
+            >
+              3s-Soft (3s-soft.com)
+            </a>
+          </p>
+        </footer>
       </main>
 
       {/* Shortage Add Modal / Bottom Drawer */}

@@ -25,8 +25,21 @@ export default async function AdminLayout({
       <Navbar user={user} />
       <div className="flex-1 flex flex-col lg:flex-row max-w-7xl w-full mx-auto shadow-xs border-x border-slate-200">
         <AdminSidebar />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-50">
-          {children}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto bg-slate-50 flex flex-col justify-between">
+          <div>{children}</div>
+          <footer className="mt-12 pt-4 border-t border-slate-200 text-center text-xs text-slate-400 no-print">
+            <p>
+              Designed &amp; Developed by{' '}
+              <a
+                href="https://3s-soft.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sky-600 font-semibold hover:underline"
+              >
+                3s-Soft (3s-soft.com)
+              </a>
+            </p>
+          </footer>
         </main>
       </div>
     </div>
