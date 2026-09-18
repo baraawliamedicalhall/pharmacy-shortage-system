@@ -27,6 +27,45 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const isOtc = searchParams.get('otc') === 'true'
+    if (isOtc) {
+      const candidates = await prisma.medicine.findMany({
+        where: {
+          isActive: true,
+          dosageForm: { in: ['Tablet', 'Capsule', 'Chewable Tablet'] },
+          OR: [
+            { brandName: 'Napa Extra' },
+            { brandName: 'Napa', strength: '500 mg' },
+            { brandName: 'Ace Plus' },
+            { brandName: 'Ace', strength: '500 mg' },
+            { brandName: 'Seclo', strength: '20 mg' },
+            { brandName: 'Sergel', strength: '20 mg' },
+            { brandName: 'Monas', strength: '10 mg' },
+            { brandName: 'Fexo', strength: '120 mg' },
+            { brandName: 'Ceevit', strength: '250 mg' },
+            { brandName: 'Almex', strength: '400 mg' },
+            { brandName: 'Pantonix', strength: '20 mg' },
+            { brandName: 'Coralcal-D' },
+          ],
+        },
+        include: {
+          manufacturer: { select: { name: true, shortName: true } },
+        },
+        orderBy: [{ brandName: 'asc' }, { mrp: 'desc' }],
+      })
+
+      // Deduplicate so each distinct brand & strength gets 1 primary record
+      const seen = new Set<string>()
+      const uniqueOtc = candidates.filter((m) => {
+        const key = `${m.brandName.toLowerCase().trim()}|${m.strength.toLowerCase().trim()}`
+        if (seen.has(key)) return false
+        seen.add(key)
+        return true
+      })
+
+      return NextResponse.json({ medicines: uniqueOtc })
+    }
+
     if (!q || q.length < 2) {
       // Return high-demand / frequent medicines
       const defaultMeds = await prisma.medicine.findMany({
