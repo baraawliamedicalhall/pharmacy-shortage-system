@@ -16,16 +16,55 @@ async function main() {
   await prisma.manufacturer.deleteMany()
   await prisma.user.deleteMany()
 
-  // 1. Create Default Users (Admin + Employees)
-  const defaultPasswordHash = await bcrypt.hash('admin123', 10)
-  const employeePinHash = await bcrypt.hash('1234', 10)
+  // 1. Create Default Users (Admin + Specialized Staff Roles + Employees)
+  const defaultPinHash = await bcrypt.hash('1234', 10)
 
   const admin = await prisma.user.create({
     data: {
       employeeId: 'ADMIN',
       name: 'System Administrator',
-      passwordHash: defaultPasswordHash,
-      role: Role.ADMIN,
+      passwordHash: defaultPinHash,
+      role: 'ADMIN' as Role,
+      isActive: true,
+    },
+  })
+
+  const manager = await prisma.user.create({
+    data: {
+      employeeId: 'MGR001',
+      name: 'Branch Manager',
+      passwordHash: defaultPinHash,
+      role: 'MANAGER' as Role,
+      isActive: true,
+    },
+  })
+
+  const pharmacist = await prisma.user.create({
+    data: {
+      employeeId: 'PHARM001',
+      name: 'Chief Pharmacist',
+      passwordHash: defaultPinHash,
+      role: 'PHARMACIST' as Role,
+      isActive: true,
+    },
+  })
+
+  const cashier = await prisma.user.create({
+    data: {
+      employeeId: 'CASH001',
+      name: 'Counter Cashier',
+      passwordHash: defaultPinHash,
+      role: 'CASHIER' as Role,
+      isActive: true,
+    },
+  })
+
+  const salesRep = await prisma.user.create({
+    data: {
+      employeeId: 'REP001',
+      name: 'Wholesale Sales Rep',
+      passwordHash: defaultPinHash,
+      role: 'SALES_REP' as Role,
       isActive: true,
     },
   })
@@ -34,8 +73,8 @@ async function main() {
     data: {
       employeeId: 'EMP001',
       name: 'Rahim Ahmed',
-      passwordHash: employeePinHash,
-      role: Role.EMPLOYEE,
+      passwordHash: defaultPinHash,
+      role: 'EMPLOYEE' as Role,
       isActive: true,
     },
   })
@@ -44,8 +83,8 @@ async function main() {
     data: {
       employeeId: 'EMP002',
       name: 'Karim Uddin',
-      passwordHash: employeePinHash,
-      role: Role.EMPLOYEE,
+      passwordHash: defaultPinHash,
+      role: 'EMPLOYEE' as Role,
       isActive: true,
     },
   })
@@ -54,8 +93,8 @@ async function main() {
     data: {
       employeeId: 'EMP003',
       name: 'Hasan Mahmud',
-      passwordHash: employeePinHash,
-      role: Role.EMPLOYEE,
+      passwordHash: defaultPinHash,
+      role: 'EMPLOYEE' as Role,
       isActive: true,
     },
   })
@@ -64,13 +103,13 @@ async function main() {
     data: {
       employeeId: 'EMP004',
       name: 'Jamal Hossain',
-      passwordHash: employeePinHash,
-      role: Role.EMPLOYEE,
+      passwordHash: defaultPinHash,
+      role: 'EMPLOYEE' as Role,
       isActive: true,
     },
   })
 
-  console.log('✓ Users created (Admin: ADMIN / admin123; Employees: EMP001-EMP004 / 1234)')
+  console.log('✓ Users created (Admin, Manager, Pharmacist, Cashier, Sales Rep, Floor Staff - PIN: 1234)')
 
   // 2. Create Manufacturers
   const manufacturersData = [
