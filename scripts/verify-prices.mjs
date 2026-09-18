@@ -23,7 +23,7 @@ async function check() {
 
   const samples = await prisma.medicine.findMany({
     where: {
-      brandName: { in: brands },
+      brandName: { contains: 'Napa' },
     },
     take: 25,
     select: {

@@ -56,6 +56,9 @@ interface CartItem {
   quantity: number
   discountAmount: number
   total: number
+  mrp?: number | null
+  stripPrice?: number | null
+  boxPrice?: number | null
 }
 
 const FREQUENT_OTC_CHIPS = [
@@ -234,6 +237,9 @@ export default function PosTerminalPage() {
         quantity: 1,
         discountAmount: 0,
         total: unitPrice,
+        mrp: med.mrp,
+        stripPrice: med.stripPrice,
+        boxPrice: med.boxPrice,
       }
       setCart([newItem, ...cart])
     }
@@ -244,32 +250,25 @@ export default function PosTerminalPage() {
   }
 
   // Update item unit (Tablet -> Strip -> Box)
-  const changeItemUnit = async (index: number, newUnit: 'Tablet' | 'Strip' | 'Box' | 'Bottle') => {
+  const changeItemUnit = (index: number, newUnit: 'Tablet' | 'Strip' | 'Box' | 'Bottle') => {
     const item = cart[index]
-    // Fetch medicine pricing to ensure accurate rates
-    try {
-      const res = await fetch(`/api/pos/medicines?q=${encodeURIComponent(item.brandName)}&limit=1`)
-      const data = await res.json()
-      const med: Medicine = data.medicines?.[0]
-
-      let price = item.unitPrice
-      if (med) {
-        if (newUnit === 'Box') price = med.boxPrice || (med.mrp || 10) * 100
-        else if (newUnit === 'Strip') price = med.stripPrice || (med.mrp || 10) * 10
-        else price = med.mrp || 5.0
-      }
-
-      const updated = [...cart]
-      updated[index] = {
-        ...item,
-        unit: newUnit,
-        unitPrice: price,
-        total: Math.round(price * item.quantity * 100) / 100,
-      }
-      setCart(updated)
-    } catch {
-      // fallback
+    let price = item.unitPrice
+    if (newUnit === 'Box') {
+      price = item.boxPrice || (item.mrp ? item.mrp * 100 : 100)
+    } else if (newUnit === 'Strip') {
+      price = item.stripPrice || (item.mrp ? item.mrp * 10 : 20)
+    } else {
+      price = item.mrp || 5.0
     }
+
+    const updated = [...cart]
+    updated[index] = {
+      ...item,
+      unit: newUnit,
+      unitPrice: price,
+      total: Math.round(price * item.quantity * 100) / 100,
+    }
+    setCart(updated)
   }
 
   // Adjust item quantity

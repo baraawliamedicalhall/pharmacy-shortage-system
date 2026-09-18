@@ -318,17 +318,23 @@ function computeAccuratePricing(brandName, genericName, strength, dosageForm) {
         boxPrice = 500.00
         packDescription = '20 x 10 Blister Pack'
         if (brand.includes('napa extra')) {
-          stripsPerBox = 33
+          unitsPerStrip = 12
+          stripsPerBox = 11
           boxPrice = 330.00
-          packDescription = '33 x 10 Blister Pack'
+          packDescription = '11 x 12 Blister Pack'
         } else if (brand.includes('ace plus')) {
           unitMrp = 2.51
+          unitsPerStrip = 10
+          stripsPerBox = 20
           boxPrice = 502.00
+          packDescription = '20 x 10 Blister Pack'
         }
       } else if (str.includes('665') || brand.includes('extend') || brand.includes('xr')) {
         unitMrp = 2.00
+        unitsPerStrip = 12
         stripsPerBox = 20
-        packDescription = '20 x 10 Blister Pack'
+        boxPrice = 480.00
+        packDescription = '20 x 12 Blister Pack'
       } else if (str.includes('1000') || brand.includes('one')) {
         unitMrp = 2.50
         stripsPerBox = 20
