@@ -16,6 +16,7 @@ import {
   Store,
   DollarSign,
   FileText,
+  Trash2,
 } from 'lucide-react'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
 
@@ -115,6 +116,28 @@ export default function WholesaleOrdersListPage() {
     }
   }
 
+  const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete wholesale order "${orderNumber}"?\n\nThis will remove the order and adjust the retailer's outstanding balance.`
+    )
+    if (!confirmDelete) return
+
+    try {
+      const res = await fetch(`/api/wholesale/orders/${orderId}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (res.ok) {
+        showToast('success', `Order "${orderNumber}" deleted successfully`)
+        fetchOrders()
+      } else {
+        showToast('error', data.error || 'Failed to delete order')
+      }
+    } catch {
+      showToast('error', 'Failed to connect to local server')
+    }
+  }
+
   const statusStyles: any = {
     PENDING: 'bg-amber-100 text-amber-800 border-amber-200',
     CONFIRMED: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -146,7 +169,7 @@ export default function WholesaleOrdersListPage() {
             Wholesale Orders
           </h1>
           <p className="text-sm text-slate-500">
-            Fulfill orders, dispatch delivery chalans, and print commercial invoices for 30+ retailers.
+            Fulfill orders, dispatch delivery chalans, and print commercial invoices for retailers.
           </p>
         </div>
 
@@ -285,14 +308,23 @@ export default function WholesaleOrdersListPage() {
                         </select>
                       </td>
                       <td className="py-3 px-4 text-center">
-                        <Link
-                          href={`/admin/wholesale/invoices/${order.id}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 transition-colors"
-                          title="Print A4 Invoice & Chalan"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                          <span>Print</span>
-                        </Link>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <Link
+                            href={`/admin/wholesale/invoices/${order.id}`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 transition-colors"
+                            title="Print A4 Invoice & Chalan"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                            <span>Print</span>
+                          </Link>
+                          <button
+                            onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
+                            className="p-1 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title="Delete Order"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )

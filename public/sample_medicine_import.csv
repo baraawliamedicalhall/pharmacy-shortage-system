@@ -1,0 +1,4 @@
+brand_name,generic_name,strength,dosage_form,manufacturer,mrp,trade_price,strip_price,box_price,trade_box_price,units_per_strip,strips_per_box,units_per_box,purchase_unit,retail_unit,pack_description,search_keywords,barcode
+Napa,Paracetamol,500 mg,Tablet,Beximco Pharmaceuticals Ltd.,1.20,1.02,12.00,240.00,204.00,10,20,200,Box,Tablet,20 x 10 Blister Pack,napa paracitamol fever pain,8941100100012
+Seclo,Omeprazole,20 mg,Capsule,Square Pharmaceuticals PLC,7.00,5.95,70.00,700.00,595.00,10,10,100,Box,Capsule,10 x 10 Alu-Alu Pack,seclo omeprazole gastric ulcer acid,8941100100029
+Maxpro,Esomeprazole,20 mg,Tablet,Renata Limited,9.00,7.65,90.00,540.00,459.00,10,6,60,Box,Tablet,6 x 10 Blister Pack,maxpro esomeprazole acidity,8941100100036

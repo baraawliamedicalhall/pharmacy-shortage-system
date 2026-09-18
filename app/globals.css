@@ -10,6 +10,15 @@
   }
 }
 
+/* Hide scrollbar utility for OTC chips horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Custom scrollbar for fast scrolling */
 ::-webkit-scrollbar {
   width: 6px;
@@ -42,7 +51,6 @@
 
   .no-print,
   nav,
-  header,
   aside,
   button:not(.print-include),
   .pwa-banner {
@@ -79,3 +87,4 @@
     page-break-inside: avoid;
   }
 }
+

@@ -5,11 +5,14 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { Pill, LogOut, Shield, Smartphone, Wifi, CreditCard } from 'lucide-react'
 
+import { Role } from '@prisma/client'
+import { ROLE_CONFIGS, isAdministrativeRole } from '@/lib/roles'
+
 interface NavbarProps {
   user?: {
     employeeId: string
     name: string
-    role: 'ADMIN' | 'EMPLOYEE' | 'RETAILER'
+    role: Role | string
   } | null
 }
 
@@ -27,8 +30,9 @@ export function Navbar({ user }: NavbarProps) {
     }
   }
 
-  const isAdmin = user?.role === 'ADMIN'
+  const isAdmin = isAdministrativeRole(user?.role as Role)
   const inAdminSection = pathname.startsWith('/admin')
+  const roleConfig = user?.role ? ROLE_CONFIGS[user.role as Role] : null
 
   return (
     <header className="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-sm no-print">
@@ -104,7 +108,14 @@ export function Navbar({ user }: NavbarProps) {
                   {user.name.charAt(0)}
                 </div>
                 <div className="text-left hidden xs:block">
-                  <div className="font-semibold leading-none text-slate-100">{user.name}</div>
+                  <div className="font-semibold leading-none text-slate-100 flex items-center gap-1.5">
+                    <span>{user.name}</span>
+                    {roleConfig && (
+                      <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold bg-slate-700/90 text-sky-300 border border-slate-600">
+                        {roleConfig.shortTitle}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-[10px] text-slate-400 leading-none mt-0.5">{user.employeeId}</div>
                 </div>
               </div>

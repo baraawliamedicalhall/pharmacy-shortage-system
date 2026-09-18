@@ -9,6 +9,10 @@ generator client {
 
 enum Role {
   ADMIN
+  MANAGER
+  PHARMACIST
+  CASHIER
+  SALES_REP
   EMPLOYEE
   RETAILER
 }
@@ -138,7 +142,7 @@ model Shortage {
   @@index([status])
 }
 
-// B2B Retailer Profile (for 30+ Retailers)
+// B2B Retailer Profile
 model Retailer {
   id                    String            @id @default(cuid())
   retailerCode          String            @unique // e.g. RET-001, RET-002

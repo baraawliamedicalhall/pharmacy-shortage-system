@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 
+// Lightweight select for POS — only fields needed for display & cart
+const POS_SELECT = {
+  id: true,
+  brandName: true,
+  genericName: true,
+  strength: true,
+  dosageForm: true,
+  barcode: true,
+  mrp: true,
+  stripPrice: true,
+  boxPrice: true,
+  tradePrice: true,
+  unitsPerStrip: true,
+  stripsPerBox: true,
+  manufacturer: { select: { name: true, shortName: true } },
+}
+
 export async function GET(req: NextRequest) {
   try {
     const user = await getCurrentUser()
@@ -10,23 +27,22 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url)
-    const q = searchParams.get('q')?.trim().toLowerCase() || ''
+    const q = searchParams.get('q')?.trim() || ''
     const barcode = searchParams.get('barcode')?.trim()
     const limit = Math.min(parseInt(searchParams.get('limit') || '25', 10), 50)
 
-    // Exact barcode match first
+    // Exact barcode match first — instant return
     if (barcode) {
       const match = await prisma.medicine.findFirst({
         where: { barcode, isActive: true },
-        include: {
-          manufacturer: { select: { name: true, shortName: true } },
-        },
+        select: POS_SELECT,
       })
       if (match) {
         return NextResponse.json({ medicines: [match] })
       }
     }
 
+    // OTC quick-access medicines
     const isOtc = searchParams.get('otc') === 'true'
     if (isOtc) {
       const candidates = await prisma.medicine.findMany({
@@ -48,13 +64,10 @@ export async function GET(req: NextRequest) {
             { brandName: 'Coralcal-D' },
           ],
         },
-        include: {
-          manufacturer: { select: { name: true, shortName: true } },
-        },
+        select: POS_SELECT,
         orderBy: [{ brandName: 'asc' }, { mrp: 'desc' }],
       })
 
-      // Deduplicate so each distinct brand & strength gets 1 primary record
       const seen = new Set<string>()
       const uniqueOtc = candidates.filter((m) => {
         const key = `${m.brandName.toLowerCase().trim()}|${m.strength.toLowerCase().trim()}`
@@ -81,30 +94,101 @@ export async function GET(req: NextRequest) {
             { brandName: { startsWith: 'Maxpro' } },
           ],
         },
-        include: {
-          manufacturer: { select: { name: true, shortName: true } },
-        },
+        select: POS_SELECT,
         orderBy: { brandName: 'asc' },
       })
       return NextResponse.json({ medicines: defaultMeds })
     }
 
-    const medicines = await prisma.medicine.findMany({
-      take: limit,
-      where: {
-        isActive: true,
-        OR: [
-          { brandName: { contains: q } },
-          { genericName: { contains: q } },
-          { barcode: { equals: q } },
-          { searchKeywords: { contains: q } },
-        ],
-      },
-      include: {
-        manufacturer: { select: { name: true, shortName: true } },
-      },
-      orderBy: { brandName: 'asc' },
+    // Smart search: detect multi-word queries (e.g. "napa 500", "seclo 20")
+    const words = q.toLowerCase().split(/\s+/).filter(Boolean)
+    const primaryTerm = words[0]
+    const secondaryTerms = words.slice(1)
+
+    // Build search conditions — fetch more candidates for re-ranking
+    const fetchLimit = Math.min(limit * 3, 75)
+
+    // Strategy: two-phase search for accuracy
+    // Phase 1: startsWith on brandName (fastest, most relevant)
+    // Phase 2: contains fallback on brand, generic, keywords
+    const [startsWithResults, containsResults] = await Promise.all([
+      prisma.medicine.findMany({
+        take: fetchLimit,
+        where: {
+          isActive: true,
+          brandName: { startsWith: primaryTerm },
+        },
+        select: POS_SELECT,
+        orderBy: { brandName: 'asc' },
+      }),
+      prisma.medicine.findMany({
+        take: fetchLimit,
+        where: {
+          isActive: true,
+          OR: [
+            { brandName: { contains: primaryTerm } },
+            { genericName: { contains: primaryTerm } },
+            { barcode: { equals: q } },
+            { searchKeywords: { contains: primaryTerm } },
+          ],
+          // Exclude startsWith results (they're already in phase 1)
+          NOT: { brandName: { startsWith: primaryTerm } },
+        },
+        select: POS_SELECT,
+        orderBy: { brandName: 'asc' },
+      }),
+    ])
+
+    // Merge and deduplicate
+    const seenIds = new Set<string>()
+    const allResults: typeof startsWithResults = []
+
+    for (const med of [...startsWithResults, ...containsResults]) {
+      if (seenIds.has(med.id)) continue
+      seenIds.add(med.id)
+
+      // If multi-word query, filter by secondary terms (strength, generic, etc.)
+      if (secondaryTerms.length > 0) {
+        const searchable = `${med.brandName} ${med.strength} ${med.genericName} ${med.dosageForm}`.toLowerCase()
+        const allMatch = secondaryTerms.every((t) => searchable.includes(t))
+        if (!allMatch) continue
+      }
+
+      allResults.push(med)
+    }
+
+    // Relevance scoring for final sort
+    const scored = allResults.map((med) => {
+      let score = 0
+      const bn = med.brandName.toLowerCase()
+
+      // Exact brand name match — top priority
+      if (bn === primaryTerm) score += 100
+      // Brand starts with query
+      else if (bn.startsWith(primaryTerm)) score += 50
+      // Brand contains query
+      else if (bn.includes(primaryTerm)) score += 20
+      // Generic name match — lower priority
+      else score += 5
+
+      // Bonus: has MRP (priced items are more useful)
+      if (med.mrp && med.mrp > 0) score += 3
+
+      // Bonus: common dosage forms rank higher
+      const df = med.dosageForm.toLowerCase()
+      if (df === 'tablet' || df === 'capsule') score += 2
+      else if (df === 'syrup' || df === 'suspension') score += 1
+
+      return { med, score }
     })
+
+    // Sort by score descending, then alphabetically
+    scored.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      return a.med.brandName.localeCompare(b.med.brandName)
+    })
+
+    const medicines = scored.slice(0, limit).map((s) => s.med)
 
     return NextResponse.json({ medicines })
   } catch (err: any) {
@@ -112,3 +196,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
   }
 }
+

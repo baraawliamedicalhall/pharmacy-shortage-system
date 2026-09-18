@@ -88,15 +88,50 @@ export async function DELETE(
     }
 
     const { id } = await context.params
+    const { searchParams } = new URL(req.url)
+    const soft = searchParams.get('soft') === 'true'
 
-    // Soft deactivate to protect historical orders
-    const deactivated = await prisma.retailer.update({
-      where: { id },
-      data: { isActive: false },
+    if (soft) {
+      // Soft deactivate
+      const deactivated = await prisma.retailer.update({
+        where: { id },
+        data: { isActive: false },
+      })
+      return NextResponse.json({ success: true, retailer: deactivated, message: 'Retailer deactivated' })
+    }
+
+    // Full permanent removal in transaction
+    await prisma.$transaction(async (tx) => {
+      const orders = await tx.wholesaleOrder.findMany({
+        where: { retailerId: id },
+        select: { id: true },
+      })
+      const orderIds = orders.map((o) => o.id)
+
+      if (orderIds.length > 0) {
+        await tx.wholesaleOrderItem.deleteMany({
+          where: { orderId: { in: orderIds } },
+        })
+        await tx.retailerPayment.deleteMany({
+          where: { retailerId: id },
+        })
+        await tx.wholesaleOrder.deleteMany({
+          where: { retailerId: id },
+        })
+      } else {
+        await tx.retailerPayment.deleteMany({
+          where: { retailerId: id },
+        })
+      }
+
+      await tx.retailer.delete({
+        where: { id },
+      })
     })
 
-    return NextResponse.json({ success: true, retailer: deactivated })
+    return NextResponse.json({ success: true, message: 'Retailer permanently removed' })
   } catch (err: any) {
+    console.error('Delete retailer error:', err)
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 })
   }
 }

@@ -19,11 +19,13 @@ import { ToastContainer, ToastMessage } from '@/components/Toast'
 import { PwaInstallBanner } from '@/components/PwaInstallBanner'
 import { ShortageAddModal, SelectedMedicine } from '@/components/ShortageAddModal'
 
+import { Role } from '@prisma/client'
+
 export interface UserProfile {
   id: string
   employeeId: string
   name: string
-  role: 'ADMIN' | 'EMPLOYEE' | 'RETAILER'
+  role: Role | string
 }
 
 interface ShortageReport {

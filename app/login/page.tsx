@@ -3,6 +3,8 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Pill, Lock, User, AlertCircle, Wifi, ArrowRight } from 'lucide-react'
+import { Role } from '@prisma/client'
+import { ROLE_CONFIGS } from '@/lib/roles'
 
 function LoginForm() {
   const router = useRouter()
@@ -59,7 +61,9 @@ function LoginForm() {
       }
 
       // Hard redirect ensuring relative navigation on the active host (e.g. 192.168.1.159:3000)
-      const target = data.user?.role === 'ADMIN' && safeRedirect === '/' ? '/admin' : safeRedirect
+      const userRole = data.user?.role as Role | undefined
+      const defaultRolePath = userRole ? ROLE_CONFIGS[userRole]?.defaultPath : '/'
+      const target = safeRedirect === '/' && defaultRolePath ? defaultRolePath : safeRedirect
       window.location.href = target
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Error logging in'

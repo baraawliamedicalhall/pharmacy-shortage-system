@@ -24,6 +24,7 @@ export interface ReceiptSaleData {
     quantity: number
     unit: string
     unitPrice: number
+    discountAmount?: number
     total: number
     medicine: {
       brandName: string
@@ -54,10 +55,11 @@ export function ThermalReceiptModal({
     window.print()
   }
 
-  // Keyboard shortcut: Escape to close
+  // Keyboard shortcut: Escape or Enter to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        e.preventDefault()
         onClose()
       }
     }
@@ -153,7 +155,14 @@ export function ThermalReceiptModal({
                     </td>
                     <td className="py-1 text-center">{item.quantity}</td>
                     <td className="py-1 text-right">৳{item.unitPrice.toFixed(1)}</td>
-                    <td className="py-1 text-right font-bold">৳{item.total.toFixed(1)}</td>
+                    <td className="py-1 text-right font-bold">
+                      {item.discountAmount !== undefined && item.discountAmount > 0 && (
+                        <div className="text-[9px] text-slate-400 line-through">
+                          ৳{(item.unitPrice * item.quantity).toFixed(1)}
+                        </div>
+                      )}
+                      <div>৳{item.total.toFixed(1)}</div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -167,8 +176,8 @@ export function ThermalReceiptModal({
               <span>৳ {sale.subtotal.toFixed(2)}</span>
             </div>
             {sale.discountAmount > 0 && (
-              <div className="flex justify-between text-emerald-700">
-                <span>Discount:</span>
+              <div className="flex justify-between text-emerald-700 font-semibold">
+                <span>Discount{sale.subtotal > 0 ? ` (${((sale.discountAmount / sale.subtotal) * 100).toFixed(1)}%)` : ''}:</span>
                 <span>- ৳ {sale.discountAmount.toFixed(2)}</span>
               </div>
             )}
@@ -199,13 +208,13 @@ export function ThermalReceiptModal({
         </div>
 
         {/* Modal Bottom Close */}
-        <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between no-print shrink-0">
-          <span className="text-[11px] text-slate-400">Press Esc to close</span>
+        <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center gap-3 no-print shrink-0">
+          <span className="text-[11px] text-slate-400 shrink-0">Esc / Enter</span>
           <button
             onClick={onClose}
-            className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
+            className="flex-1 py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
           >
-            Next Customer (Enter)
+            Next Customer →
           </button>
         </div>
       </div>

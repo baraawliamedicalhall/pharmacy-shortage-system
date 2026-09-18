@@ -18,6 +18,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Download,
 } from 'lucide-react'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
 
@@ -855,12 +856,22 @@ export default function AdminMedicinesPage() {
 
             <div className="p-5 overflow-y-auto space-y-4 text-xs">
               <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-sky-900">
-                <div className="font-bold mb-1">Required CSV Columns:</div>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="font-bold">Required CSV Columns:</div>
+                  <a
+                    href="/sample_medicine_import.csv"
+                    download="sample_medicine_import.csv"
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 hover:text-sky-900 hover:underline bg-white px-2 py-0.5 rounded border border-sky-300 shadow-xs transition-colors"
+                  >
+                    <Download className="w-3 h-3" />
+                    Download Sample CSV
+                  </a>
+                </div>
                 <code className="text-[11px] font-mono block bg-white p-2 rounded border border-sky-200">
                   brand_name,generic_name,strength,dosage_form,manufacturer
                 </code>
-                <div className="text-[11px] text-sky-700 mt-1">
-                  Optional: pack_description, purchase_unit, retail_unit, search_keywords
+                <div className="text-[11px] text-sky-700 mt-1.5 leading-relaxed">
+                  <strong>Optional:</strong> mrp, trade_price, strip_price, box_price, trade_box_price, units_per_strip, strips_per_box, units_per_box, pack_description, purchase_unit, retail_unit, search_keywords, barcode
                 </div>
               </div>
 

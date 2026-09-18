@@ -20,6 +20,23 @@ interface RawCSVRow {
   retail_unit?: string
   search_keywords?: string
   barcode?: string
+  mrp?: string
+  price?: string
+  strip_price?: string
+  stripprice?: string
+  box_price?: string
+  boxprice?: string
+  trade_price?: string
+  tradeprice?: string
+  tp?: string
+  trade_box_price?: string
+  tradeboxprice?: string
+  units_per_strip?: string
+  unitsperstrip?: string
+  strips_per_box?: string
+  stripsperbox?: string
+  units_per_box?: string
+  unitsperbox?: string
   [key: string]: string | undefined
 }
 
@@ -80,6 +97,14 @@ export async function POST(req: NextRequest) {
       retailUnit?: string
       searchKeywords?: string
       barcode?: string
+      mrp?: number
+      stripPrice?: number
+      boxPrice?: number
+      tradePrice?: number
+      tradeBoxPrice?: number
+      unitsPerStrip?: number
+      stripsPerBox?: number
+      unitsPerBox?: number
       rowNumber: number
     }> = []
 
@@ -96,6 +121,20 @@ export async function POST(req: NextRequest) {
       if (m.shortName) {
         mfgLookup.set(m.shortName.toLowerCase().trim(), m.id)
       }
+    }
+
+    const parseNum = (val?: string) => {
+      if (!val) return undefined
+      const clean = val.replace(/[^0-9.]/g, '').trim()
+      const parsed = parseFloat(clean)
+      return isNaN(parsed) ? undefined : parsed
+    }
+
+    const parseIntNum = (val?: string) => {
+      if (!val) return undefined
+      const clean = val.replace(/[^0-9]/g, '').trim()
+      const parsed = parseInt(clean, 10)
+      return isNaN(parsed) ? undefined : parsed
     }
 
     for (let i = 0; i < rows.length; i++) {
@@ -140,6 +179,14 @@ export async function POST(req: NextRequest) {
         retailUnit: (r.retail_unit || 'Tablet').trim(),
         searchKeywords: (r.search_keywords || '').trim() || undefined,
         barcode: (r.barcode || '').trim() || undefined,
+        mrp: parseNum(r.mrp || r.price),
+        stripPrice: parseNum(r.strip_price || r.stripprice),
+        boxPrice: parseNum(r.box_price || r.boxprice),
+        tradePrice: parseNum(r.trade_price || r.tradeprice || r.tp),
+        tradeBoxPrice: parseNum(r.trade_box_price || r.tradeboxprice),
+        unitsPerStrip: parseIntNum(r.units_per_strip || r.unitsperstrip),
+        stripsPerBox: parseIntNum(r.strips_per_box || r.stripsperbox),
+        unitsPerBox: parseIntNum(r.units_per_box || r.unitsperbox),
         rowNumber: rowNum,
       })
     }
@@ -196,6 +243,14 @@ export async function POST(req: NextRequest) {
             retailUnit: row.retailUnit ?? existingMed.retailUnit,
             searchKeywords: row.searchKeywords ?? existingMed.searchKeywords,
             barcode: row.barcode ?? existingMed.barcode,
+            ...(row.mrp !== undefined && { mrp: row.mrp }),
+            ...(row.stripPrice !== undefined && { stripPrice: row.stripPrice }),
+            ...(row.boxPrice !== undefined && { boxPrice: row.boxPrice }),
+            ...(row.tradePrice !== undefined && { tradePrice: row.tradePrice }),
+            ...(row.tradeBoxPrice !== undefined && { tradeBoxPrice: row.tradeBoxPrice }),
+            ...(row.unitsPerStrip !== undefined && { unitsPerStrip: row.unitsPerStrip }),
+            ...(row.stripsPerBox !== undefined && { stripsPerBox: row.stripsPerBox }),
+            ...(row.unitsPerBox !== undefined && { unitsPerBox: row.unitsPerBox }),
             isActive: true,
           },
         })
@@ -213,6 +268,14 @@ export async function POST(req: NextRequest) {
             retailUnit: row.retailUnit || 'Tablet',
             searchKeywords: row.searchKeywords,
             barcode: row.barcode,
+            mrp: row.mrp,
+            stripPrice: row.stripPrice,
+            boxPrice: row.boxPrice,
+            tradePrice: row.tradePrice,
+            tradeBoxPrice: row.tradeBoxPrice,
+            unitsPerStrip: row.unitsPerStrip ?? 10,
+            stripsPerBox: row.stripsPerBox ?? 10,
+            unitsPerBox: row.unitsPerBox ?? 100,
             isActive: true,
           },
         })

@@ -20,6 +20,8 @@ import {
   PlusCircle,
   CreditCard,
   Package,
+  BarChart3,
+  TrendingUp,
 } from 'lucide-react'
 
 export function AdminSidebar() {
@@ -39,16 +41,18 @@ export function AdminSidebar() {
       title: 'Counter & Retail Sales',
       links: [
         { href: '/pos', label: 'POS Terminal Counter', icon: CreditCard },
+        { href: '/admin/pos/reports', label: 'POS Sales Analytics', icon: BarChart3 },
       ],
     },
     {
-      title: 'Wholesale & B2B (30+ Retailers)',
+      title: 'Wholesale & B2B',
       links: [
         { href: '/admin/wholesale', label: 'Wholesale Hub', icon: Package, exact: true },
         { href: '/admin/wholesale/orders/new', label: 'New Wholesale Order', icon: PlusCircle },
         { href: '/admin/wholesale/orders', label: 'Wholesale Orders', icon: ShoppingCart },
-        { href: '/admin/wholesale/retailers', label: 'Retailer Directory (30+)', icon: Store },
+        { href: '/admin/wholesale/retailers', label: 'Retailer Directory', icon: Store },
         { href: '/admin/wholesale/payments', label: 'Dues & Payments', icon: CreditCard },
+        { href: '/admin/wholesale/reports', label: 'Retailer Advance Reports', icon: TrendingUp },
       ],
     },
     {

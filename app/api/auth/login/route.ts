@@ -4,6 +4,8 @@ import { verifyPassword, setSessionCookie } from '@/lib/auth'
 import { loginSchema } from '@/lib/validations'
 import { checkRateLimit, resetRateLimit } from '@/lib/rate-limit'
 import { createAuditLog } from '@/lib/audit'
+import { Role } from '@prisma/client'
+import { ROLE_CONFIGS } from '@/lib/roles'
 
 function getClientRedirectUrl(req: NextRequest, destination: string): URL {
   const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || '192.168.1.159:3000'
@@ -123,7 +125,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (isFormData) {
-      const defaultDest = user.role === 'ADMIN' ? '/admin' : '/'
+      const defaultDest = ROLE_CONFIGS[user.role as Role]?.defaultPath || '/'
       const destination =
         redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
           ? redirectParam

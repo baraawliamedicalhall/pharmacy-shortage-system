@@ -5,6 +5,8 @@ import { Role } from '@prisma/client'
 import { Navbar } from '@/components/Navbar'
 import { AdminSidebar } from '@/components/AdminSidebar'
 
+import { isAdministrativeRole } from '@/lib/roles'
+
 export default async function AdminLayout({
   children,
 }: {
@@ -16,7 +18,7 @@ export default async function AdminLayout({
     redirect('/login?redirect=/admin')
   }
 
-  if (user.role !== Role.ADMIN) {
+  if (!isAdministrativeRole(user.role)) {
     redirect('/')
   }
 

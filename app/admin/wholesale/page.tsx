@@ -85,7 +85,7 @@ export default async function WholesaleDashboardPage() {
             Wholesale Management Hub
           </h1>
           <p className="text-sm text-slate-500">
-            Supplying 30+ pharmacy retailers with order fulfillment, invoices, and credit tracking.
+            Supplying pharmacy retailers with order fulfillment, invoices, and credit tracking.
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export default async function WholesaleDashboardPage() {
               ৳ {totalOutstandingDues.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </div>
             <div className="text-xs text-slate-500 mt-1">
-              Receivable across 30+ retailer credit accounts
+              Receivable across retailer credit accounts
             </div>
           </div>
         </div>

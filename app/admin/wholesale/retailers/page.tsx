@@ -16,6 +16,7 @@ import {
   DollarSign,
   AlertCircle,
   ExternalLink,
+  Trash2,
 } from 'lucide-react'
 import { ToastContainer, ToastMessage } from '@/components/Toast'
 
@@ -199,6 +200,28 @@ export default function RetailersPage() {
     }
   }
 
+  const handleDeleteRetailer = async (r: Retailer) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete retailer "${r.storeName}" (${r.retailerCode})?\n\nThis will permanently remove their profile and all associated records.`
+    )
+    if (!confirmDelete) return
+
+    try {
+      const res = await fetch(`/api/wholesale/retailers/${r.id}`, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (res.ok) {
+        showToast('success', `Retailer "${r.storeName}" deleted successfully`)
+        fetchRetailers()
+      } else {
+        showToast('error', data.error || 'Failed to delete retailer')
+      }
+    } catch {
+      showToast('error', 'Failed to connect to local server')
+    }
+  }
+
   const totalDues = retailers.reduce((s, r) => s + r.currentDue, 0)
   const totalCredit = retailers.reduce((s, r) => s + r.creditLimit, 0)
 
@@ -213,7 +236,7 @@ export default function RetailersPage() {
             <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-200">
               Retailer Accounts
             </span>
-            <span className="text-xs text-slate-500 font-medium">30+ Pharmacy Stores</span>
+            <span className="text-xs text-slate-500 font-medium">Pharmacy Stores</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1">
             Retailer Directory &amp; Credit Ledger
@@ -393,6 +416,13 @@ export default function RetailersPage() {
                             title="Edit Retailer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRetailer(r)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors cursor-pointer"
+                            title="Delete Retailer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>

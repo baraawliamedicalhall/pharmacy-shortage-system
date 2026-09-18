@@ -6,26 +6,25 @@ async function check() {
   const brands = [
     'Napa',
     'Napa Extra',
+    'Mig',
     'Ace',
     'Ace Plus',
     'Seclo',
+    'Maxpro',
+    'Finix',
     'Sergel',
     'Pantonix',
     'Monas',
     'Fexo',
     'Coralcal-D',
     'Ceevit',
-    'A-Cold',
-    'A-Kit',
-    'Ceftron',
-    'Almex',
   ]
 
   const samples = await prisma.medicine.findMany({
     where: {
-      brandName: { contains: 'Napa' },
+      brandName: { in: ['Mig', 'Napa', 'Napa Extra', 'Napa One', 'Seclo', 'Maxpro', 'Finix', 'Pantonix', 'Sergel', 'Monas'] },
     },
-    take: 25,
+    take: 30,
     select: {
       brandName: true,
       strength: true,

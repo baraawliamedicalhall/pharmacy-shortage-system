@@ -42,17 +42,27 @@ export const manufacturerSchema = z.object({
   isActive: z.boolean().default(true),
 })
 
+export const ROLE_VALUES = [
+  'ADMIN',
+  'MANAGER',
+  'PHARMACIST',
+  'CASHIER',
+  'SALES_REP',
+  'EMPLOYEE',
+  'RETAILER',
+] as const
+
 export const userCreateSchema = z.object({
   employeeId: z.string().min(2, 'Employee ID must be at least 2 characters').trim().toUpperCase(),
   name: z.string().min(2, 'Full name is required').trim(),
   password: z.string().min(4, 'Password or PIN must be at least 4 characters'),
-  role: z.enum(['ADMIN', 'EMPLOYEE']).default('EMPLOYEE'),
+  role: z.enum(ROLE_VALUES).default('EMPLOYEE'),
   isActive: z.boolean().default(true),
 })
 
 export const userUpdateSchema = z.object({
   name: z.string().min(2, 'Full name is required').trim(),
   password: z.string().min(4, 'Password or PIN must be at least 4 characters').optional().or(z.literal('')),
-  role: z.enum(['ADMIN', 'EMPLOYEE']).default('EMPLOYEE'),
+  role: z.enum(ROLE_VALUES).default('EMPLOYEE'),
   isActive: z.boolean().default(true),
 })

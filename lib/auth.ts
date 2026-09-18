@@ -107,3 +107,20 @@ export async function requireAdmin(): Promise<SessionPayload> {
   }
   return user
 }
+
+export interface RoleInfo {
+  label: string
+  description: string
+  badgeColor: string
+  defaultPath: string
+}
+
+export {
+  ROLE_CONFIGS,
+  ROLE_CONFIGS as ROLE_METADATA,
+  STAFF_ROLES,
+  isAdministrativeRole,
+  canManageEmployees,
+  canAccessPos,
+  canManageWholesale,
+} from './roles'
